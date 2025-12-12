@@ -44,7 +44,7 @@
             <version>3.1.1</version>
         </dependency>
 
-        <!-- УБЕРИТЕ эту зависимость - она уже в starter-data-jpa -->
+        <!--зыхыхых -->
         <!--
         <dependency>
             <groupId>org.springframework.data</groupId>
