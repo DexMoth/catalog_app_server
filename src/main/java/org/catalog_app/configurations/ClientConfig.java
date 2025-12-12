@@ -9,9 +9,11 @@ public class ClientConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("*")
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowedOriginPatterns("*")
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD")
                 .allowedHeaders("*")
-                .allowCredentials(false); // куки
+                .exposedHeaders("Authorization", "Content-Type")
+                .allowCredentials(false)// куки
+                .maxAge(3600);
     }
 }
