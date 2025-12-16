@@ -118,11 +118,6 @@ public class ItemController {
                 .toList();
     }
 
-    @GetMapping("/{id}")
-    public ItemDto get(@PathVariable(name = "id") Long id) {
-        return toDto(service.get(id));
-    }
-
     @GetMapping("/{id}/children")
     public List<ItemDto> getChildren(
             @PathVariable(name = "id") Long id) {
@@ -130,6 +125,11 @@ public class ItemController {
                 .stream()
                 .map(this::toDto)
                 .toList();
+    }
+
+    @GetMapping("/{id}")
+    public ItemDto get(@PathVariable(name = "id") Long id) {
+        return toDto(service.get(id));
     }
 
     @PutMapping("/{id}")
