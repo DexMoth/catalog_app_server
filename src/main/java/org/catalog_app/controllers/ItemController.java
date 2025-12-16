@@ -54,7 +54,7 @@ public class ItemController {
         }
 
         if (ent.getTags() != null) {
-            Set<TagDto> tags = ent.getCategories().stream()
+            Set<TagDto> tags = ent.getTags().stream()
                     .map(tagEnt -> modelMapper.map(tagEnt, TagDto.class))
                     .collect(Collectors.toSet());
             dto.setTags(tags);
@@ -106,7 +106,7 @@ public class ItemController {
 
         return service.getAll(category, tag, search)
                 .stream()
-                .map(this::toDto)
+                .map( this::toDto)
                 .toList();
     }
 

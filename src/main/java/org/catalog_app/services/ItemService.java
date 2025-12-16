@@ -66,6 +66,7 @@ public class ItemService {
         el.setUpdatedAt(entity.getUpdatedAt());
         el.setDescription(entity.getDescription());
         el.setCategories(entity.getCategories());
+        el.setTags(entity.getTags());
         el.setParent(entity.getParent());
         el.setImagePath(entity.getImagePath());
         return repository.save(el);
