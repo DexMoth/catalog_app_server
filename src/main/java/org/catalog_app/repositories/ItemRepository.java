@@ -35,21 +35,22 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
             "OR LOWER(i.description) LIKE LOWER(CONCAT('%', :searchText, '%'))")
     List<ItemEntity> findByText(@Param("searchText") String searchText);
 
-    @Query(value = """
-    WITH RECURSIVE item_tree AS (
-        SELECT id, name, description, image_path, parent_id, created_at, updated_at
-        FROM items
-        WHERE id = :itemId
-        
-        UNION ALL
-        
-        SELECT i.id, i.name, i.description, i.image_path, i.parent_id, i.created_at, i.updated_at
-        FROM items i
-        INNER JOIN item_tree it ON i.parent_id = it.id
-    )
-    SELECT * FROM item_tree WHERE id != :itemId
-    """, nativeQuery = true)
-    List<ItemEntity> findChildren(@Param("itemId") Long itemId);
+//    @Query(value = """
+//    WITH RECURSIVE item_tree AS (
+//        SELECT id, name, description, image_path, parent_id, created_at, updated_at
+//        FROM items
+//        WHERE id = :itemId
+//
+//        UNION ALL
+//
+//        SELECT i.id, i.name, i.description, i.image_path, i.parent_id, i.created_at, i.updated_at
+//        FROM items i
+//        INNER JOIN item_tree it ON i.parent_id = it.id
+//    )
+//    SELECT * FROM item_tree WHERE id != :itemId
+//    """, nativeQuery = true)
+    @Query("SELECT i FROM ItemEntity i WHERE i.parent.id = :parentId")
+    List<ItemEntity> findChildren(@Param("parentId") Long itemId);
 
     List<ItemEntity> findByParentId(Long parentId);
     List<ItemEntity> findByParentIsNull();

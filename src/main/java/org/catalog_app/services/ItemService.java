@@ -35,6 +35,12 @@ public class ItemService {
     }
 
     @Transactional
+    public List<ItemEntity> getAllWithoutParent() {
+        List<ItemEntity> result = StreamSupport.stream(repository.findByParentIsNull().spliterator(), false).toList();
+        return result;
+    }
+
+    @Transactional
     public ItemEntity get(Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new NotFoundException(ItemEntity.class, id));
