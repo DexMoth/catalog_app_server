@@ -26,13 +26,13 @@ public class CategoryController {
     }
 
     @Transactional
-    private CategoryDto toDto(CategoryEntity ent) {
+    protected CategoryDto toDto(CategoryEntity ent) {
         var dto = modelMapper.map(ent, CategoryDto.class);
         return dto;
     }
 
     @Transactional
-    private CategoryEntity toEntity(CategoryDto dto) {
+    protected CategoryEntity toEntity(CategoryDto dto) {
         var ent = modelMapper.map(dto, CategoryEntity.class);
         return ent;
     }
