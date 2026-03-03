@@ -21,19 +21,17 @@ import java.util.Set;
 public class ItemEntity extends BaseModel{
     private String name;
     private String description;
-    private String imagePath;
     private LocalDateTime createdAt = LocalDateTime.now();
     private LocalDateTime updatedAt = LocalDateTime.now();
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "parent_id")
     private ItemEntity parent;
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "item_categories",
-            joinColumns = @JoinColumn(name = "item_id"),
-            inverseJoinColumns = @JoinColumn(name = "category_id")
-    )
-    private Set<CategoryEntity> categories = new HashSet<>();
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "category_id")
+    private CategoryEntity category;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "item_tags",
@@ -41,4 +39,7 @@ public class ItemEntity extends BaseModel{
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
     private Set<TagEntity> tags = new HashSet<>();
+
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 }

@@ -18,63 +18,67 @@ public class ItemService {
     }
 
     @Transactional
-    public List<ItemEntity> getAll(Long category, Long tag, String search) {
+    public List<ItemEntity> getAll(Long user, Long category, Long tag, String search) {
+
+        if (user == null) {
+            throw new IllegalArgumentException("User ID must not be null");
+        }
+
         List<ItemEntity> result;
         if (category != null && tag != null) {
-            result = repository.findByCategoryAndTag(category, tag);
+            result = repository.findByCategoryAndTag(user, category, tag);
         } else if (category != null) {
-            result = repository.findByCategory(category);
+            result = repository.findByCategory(user, category);
         } else if (tag != null) {
-            result = repository.findByTag(tag);
+            result = repository.findByTag(user, tag);
         } else if (search != null && !search.trim().isEmpty()) {
-            result = repository.findByText(search);
+            result = repository.findByText(user, search);
         } else {
-            result = StreamSupport.stream(repository.findAll().spliterator(), false).toList();
+            result = repository.findByUserId(user);
         }
         return result.stream().toList();
     }
 
     @Transactional
-    public List<ItemEntity> getAllWithoutParent() {
-        List<ItemEntity> result = StreamSupport.stream(repository.findByParentIsNull().spliterator(), false).toList();
+    public List<ItemEntity> getAllWithoutParent(Long user) {
+        List<ItemEntity> result = StreamSupport.stream(repository.findByParentIsNull(user).spliterator(), false).toList();
         return result;
     }
 
     @Transactional
-    public ItemEntity get(Long id) {
-        return repository.findById(id)
+    public ItemEntity  get(Long user, Long id) {
+        return repository.findById(user, id)
                 .orElseThrow(() -> new NotFoundException(ItemEntity.class, id));
     }
 
     @Transactional
-    public List<ItemEntity> findChildren(Long id) {
-        return StreamSupport.stream(repository.findChildren(id).spliterator(), false).toList();
+    public List<ItemEntity> findChildren(Long user, Long id) {
+        return StreamSupport.stream(repository.findChildren(user, id).spliterator(), false).toList();
     }
 
     @Transactional
-    public ItemEntity create(ItemEntity entity) {
+    public ItemEntity create(Long user, ItemEntity entity) {
         if (entity == null) {
             throw new IllegalArgumentException("Entity is null");
         }
         return repository.save(entity);
     }
     @Transactional
-    public ItemEntity update(Long id,  ItemEntity entity) {
+    public ItemEntity update(Long user, Long id,  ItemEntity entity) {
         ItemEntity el = repository.findById(id)
                 .orElseThrow(() -> new NotFoundException(ItemEntity.class, id));
         el.setName(entity.getName());
         el.setUpdatedAt(entity.getUpdatedAt());
         el.setDescription(entity.getDescription());
-        el.setCategories(entity.getCategories());
+        el.setCategory(entity.getCategory());
         el.setTags(entity.getTags());
-        el.setParent(entity.getParent());
-        el.setImagePath(entity.getImagePath());
+        el.setParent(entity.getParent());;
         return repository.save(el);
     }
 
     @Transactional
-    public ItemEntity delete(Long id) {
-        final ItemEntity existsEntity = get(id);
+    public ItemEntity delete(Long user, Long id) {
+        final ItemEntity existsEntity = get(user, id);
         repository.delete(existsEntity);
         return existsEntity;
     }

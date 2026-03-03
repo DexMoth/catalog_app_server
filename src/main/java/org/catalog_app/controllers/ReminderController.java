@@ -1,0 +1,74 @@
+package org.catalog_app.controllers;
+
+import jakarta.transaction.Transactional;
+import org.catalog_app.configurations.Constants;
+import org.catalog_app.dtos.ReminderDto;
+import org.catalog_app.entities.ReminderEntity;
+import org.catalog_app.repositories.ReminderRepository;
+import org.catalog_app.services.ReminderService;
+import org.modelmapper.ModelMapper;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.List;
+
+@RestController
+@RequestMapping(Constants.API_URL + "/reminder")
+public class ReminderController {
+    private final ReminderRepository repository;
+    private final ReminderService service;
+    private final ModelMapper modelMapper;
+
+    public ReminderController(ReminderRepository repository, ReminderService service, ModelMapper modelMapper) {
+        this.repository = repository;
+        this.service = service;
+        this.modelMapper = modelMapper;
+    }
+
+    @Transactional
+    private ReminderDto toDto(ReminderEntity ent) {
+        var dto = modelMapper.map(ent, ReminderDto.class);
+        return dto;
+    }
+
+    @Transactional
+    private ReminderEntity toEntity(ReminderDto dto) {
+        var ent = modelMapper.map(dto, ReminderEntity.class);
+        return ent;
+    }
+
+
+    @PostMapping
+    public ReminderDto create(@RequestBody @Valid ReminderDto dto) {
+        var ent = new ReminderEntity();
+        ent.setCreatedAt(dto.getCreatedAt());
+        ent.setUpdatedAt(dto.getUpdatedAt());
+        ent.setMessage(dto.getMessage());
+        ent.setReminderDate(dto.getReminderDate());
+        ent.setRecurrenceRule(dto.getRecurrenceRule());
+        ent.setItemId(dto.getItemId());
+        ent.setIsActive(dto.getIsActive());
+        ent.setDescription(dto.getDescription());
+        return toDto(repository.save(ent));
+    }
+
+    @GetMapping
+    public List<ReminderDto> getAll() {
+        return service.getAll().stream().map(this::toDto).toList();
+    }
+
+    @GetMapping("/{id}")
+    public ReminderDto get(@PathVariable(name = "id") Long id) {
+        return toDto(service.get(id));
+    }
+
+    @PutMapping("/{id}")
+    public ReminderDto update(@PathVariable(name = "id") Long id, @RequestBody ReminderDto dto) {
+        return toDto(service.update(id, toEntity(dto)));
+    }
+
+    @DeleteMapping("/{id}")
+    public ReminderDto delete(@PathVariable(name = "id") Long id) {
+        return toDto(service.delete(id));
+    }
+}

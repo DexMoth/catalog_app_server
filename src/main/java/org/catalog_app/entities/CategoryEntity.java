@@ -24,4 +24,6 @@ public class CategoryEntity extends BaseModel{
             inverseJoinColumns = @JoinColumn(name = "item_id")
     )
     private Set<ItemEntity> items = new HashSet<>();
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 }

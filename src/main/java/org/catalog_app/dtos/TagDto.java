@@ -14,4 +14,5 @@ public class TagDto {
     private String name;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private Long userId;
 }
