@@ -41,13 +41,13 @@ public class ItemService {
 
     @Transactional
     public List<ItemEntity> getAllWithoutParent(Long user) {
-        List<ItemEntity> result = StreamSupport.stream(repository.findByParentIsNull(user).spliterator(), false).toList();
+        List<ItemEntity> result = StreamSupport.stream(repository.findByParentIsNullAndUserId(user).spliterator(), false).toList();
         return result;
     }
 
     @Transactional
     public ItemEntity  get(Long user, Long id) {
-        return repository.findById(user, id)
+        return repository.findByUserIdAndId(user, id)
                 .orElseThrow(() -> new NotFoundException(ItemEntity.class, id));
     }
 

@@ -3,7 +3,10 @@ package org.catalog_app.controllers;
 import jakarta.transaction.Transactional;
 import org.catalog_app.configurations.Constants;
 import org.catalog_app.dtos.ReminderDto;
+import org.catalog_app.entities.CategoryEntity;
 import org.catalog_app.entities.ReminderEntity;
+import org.catalog_app.error.NotFoundException;
+import org.catalog_app.repositories.RecurrenceRuleRepository;
 import org.catalog_app.repositories.ReminderRepository;
 import org.catalog_app.services.ReminderService;
 import org.modelmapper.ModelMapper;
@@ -16,11 +19,13 @@ import java.util.List;
 @RequestMapping(Constants.API_URL + "/reminder")
 public class ReminderController {
     private final ReminderRepository repository;
+    private final RecurrenceRuleRepository recurrenceRuleRepository;
     private final ReminderService service;
     private final ModelMapper modelMapper;
 
-    public ReminderController(ReminderRepository repository, ReminderService service, ModelMapper modelMapper) {
+    public ReminderController(ReminderRepository repository, RecurrenceRuleRepository recurrenceRuleRepository, ReminderService service, ModelMapper modelMapper) {
         this.repository = repository;
+        this.recurrenceRuleRepository = recurrenceRuleRepository;
         this.service = service;
         this.modelMapper = modelMapper;
     }
@@ -41,14 +46,24 @@ public class ReminderController {
     @PostMapping
     public ReminderDto create(@RequestBody @Valid ReminderDto dto) {
         var ent = new ReminderEntity();
+        ent.setTitle(dto.getTitle());
+        ent.setDescription(dto.getDescription());
+        ent.setMessage(dto.getMessage());
+
+        ent.setItemId(dto.getItemId());
+        ent.setUserId(dto.getUserId());
+
+        ent.setReminderDate(dto.getReminderDate());
+        ent.setIsActive(dto.getIsActive());
+
         ent.setCreatedAt(dto.getCreatedAt());
         ent.setUpdatedAt(dto.getUpdatedAt());
-        ent.setMessage(dto.getMessage());
-        ent.setReminderDate(dto.getReminderDate());
-        ent.setRecurrenceRule(dto.getRecurrenceRule());
-        ent.setItemId(dto.getItemId());
-        ent.setIsActive(dto.getIsActive());
-        ent.setDescription(dto.getDescription());
+
+        if (dto.getRecurrenceRuleId() != null) {
+            var rule = recurrenceRuleRepository.findById(dto.getRecurrenceRuleId())
+                    .orElseThrow(() -> new NotFoundException("Rule not found with id" + dto.getRecurrenceRuleId()));
+            ent.setRecurrenceRule(rule);
+        }
         return toDto(repository.save(ent));
     }
 

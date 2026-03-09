@@ -42,6 +42,8 @@ public class CategoryController {
     public CategoryDto create(@RequestBody @Valid CategoryDto dto) {
         var ent = new CategoryEntity();
         ent.setName(dto.getName());
+        ent.setCreatedAt(dto.getCreatedAt());
+        ent.setUserId(dto.getUserId());
         return toDto(repository.save(ent));
     }
 

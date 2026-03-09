@@ -46,6 +46,8 @@ public class ReminderService {
         el.setIsActive(entity.getIsActive());
         el.setItemId(entity.getItemId());
         el.setUpdatedAt(entity.getUpdatedAt());
+
+        el.setRecurrenceRule(entity.getRecurrenceRule());
         return repository.save(el);
     }
 

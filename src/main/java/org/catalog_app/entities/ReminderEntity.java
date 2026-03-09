@@ -1,12 +1,9 @@
 package org.catalog_app.entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import java.time.LocalDateTime;
 
 @Entity
@@ -15,22 +12,22 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Table(name = "reminders")
 public class ReminderEntity extends BaseModel {
-    @Column(name = "title", nullable = false)
     private String title;
     private String description;
     private String message;
 
-    @Column(name = "item_id", nullable = false)
+    @Column(name = "item_id")
     private Long itemId;
 
-    @Column(name = "user_id", nullable = false)
+    @Column(name = "user_id")
     private Long userId;
 
     @Column(name = "reminder_date")
     private LocalDateTime reminderDate;
 
-    @Column(name = "recurrence_rule", columnDefinition = "jsonb")
-    private String recurrenceRule;  // JSON строка
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "recurrence_rule_id")
+    private RecurrenceRuleEntity recurrenceRule;
 
     @Column(name = "is_active")
     private Boolean isActive = true;

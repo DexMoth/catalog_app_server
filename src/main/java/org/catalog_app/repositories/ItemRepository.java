@@ -36,19 +36,19 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
 
     // найти по тексту (в названии и описании)
     @Query("SELECT i FROM ItemEntity i " +
-            "WHERE i.userId = :userId AND" +
+            "WHERE i.userId = :userId AND " +
             "LOWER(i.name) LIKE LOWER(CONCAT('%', :searchText, '%')) " +
             "OR LOWER(i.description) LIKE LOWER(CONCAT('%', :searchText, '%'))")
     List<ItemEntity> findByText(@Param("userId") Long userId,
                                 @Param("searchText") String searchText);
 
-    @Query("SELECT i FROM ItemEntity i" +
+    @Query("SELECT i FROM ItemEntity i " +
             "WHERE i.userId = :userId AND i.parent.id = :parentId")
     List<ItemEntity> findChildren(@Param("userId") Long userId,
                                   @Param("parentId") Long itemId);
 
-    List<ItemEntity> findByParentId(Long userId, Long parentId);
-    List<ItemEntity> findByParentIsNull(Long userId);
+    List<ItemEntity> findByUserIdAndParentId(Long userId, Long parentId);
+    List<ItemEntity> findByParentIsNullAndUserId(Long userId);
     List<ItemEntity> findByUserId(Long userId);
-    Optional<ItemEntity> findById(Long userId, Long id);
+    Optional<ItemEntity> findByUserIdAndId(Long userId, Long id);
 }

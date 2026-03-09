@@ -42,6 +42,8 @@ public class TagController {
     public TagDto create(@RequestBody @Valid TagDto dto) {
         var ent = new TagEntity();
         ent.setName(dto.getName());
+        ent.setCreatedAt(dto.getCreatedAt());
+        ent.setUserId(dto.getUserId());
         return toDto(repository.save(ent));
     }
 

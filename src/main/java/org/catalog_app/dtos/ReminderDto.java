@@ -1,10 +1,13 @@
 package org.catalog_app.dtos;
 
+import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.catalog_app.entities.RecurrenceRuleEntity;
 
+import javax.persistence.JoinColumn;
 import java.time.LocalDateTime;
 
 @Setter
@@ -12,6 +15,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReminderDto {
+    private Long id;
     private String title;
     private String description;
     private String message;
@@ -20,8 +24,9 @@ public class ReminderDto {
     private Long userId;
 
     private LocalDateTime reminderDate;
-    private String recurrenceRule;  // JSON строка
     private Boolean isActive;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    private Long recurrenceRuleId;
 }
