@@ -18,24 +18,40 @@ public class CategoryService {
     }
 
     @Transactional
-    public List<CategoryEntity> getAll() {
+    public List<CategoryEntity> getAll(Long userId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID must not be null");
+        }
+
         return StreamSupport.stream(repository.findAll().spliterator(), false).toList();
     }
     @Transactional
-    public CategoryEntity get(Long id) {
+    public CategoryEntity get(Long userId, Long id) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID must not be null");
+        }
+
         return repository.findById(id)
                 .orElseThrow(() -> new NotFoundException(CategoryEntity.class, id));
     }
 
     @Transactional
-    public CategoryEntity create(CategoryEntity entity) {
+    public CategoryEntity create(Long userId, CategoryEntity entity) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID must not be null");
+        }
+
         if (entity == null) {
             throw new IllegalArgumentException("Entity is null");
         }
         return repository.save(entity);
     }
     @Transactional
-    public CategoryEntity update(Long id,  CategoryEntity entity) {
+    public CategoryEntity update(Long userId, Long id,  CategoryEntity entity) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID must not be null");
+        }
+
         CategoryEntity el = repository.findById(id)
                 .orElseThrow(() -> new NotFoundException(CategoryEntity.class, id));
         el.setName(entity.getName());
@@ -44,8 +60,8 @@ public class CategoryService {
     }
 
     @Transactional
-    public CategoryEntity delete(Long id) {
-        final CategoryEntity existsEntity = get(id);
+    public CategoryEntity delete(Long userId, Long id) {
+        final CategoryEntity existsEntity = get(userId, id);
         repository.delete(existsEntity);
         return existsEntity;
     }

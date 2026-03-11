@@ -28,5 +28,5 @@ public class ReminderDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    private Long recurrenceRuleId;
+    private RecurrenceRuleDto recurrenceRule;
 }

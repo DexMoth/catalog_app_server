@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import org.catalog_app.configurations.Constants;
 import org.catalog_app.dtos.ReminderDto;
 import org.catalog_app.entities.CategoryEntity;
+import org.catalog_app.entities.RecurrenceRuleEntity;
 import org.catalog_app.entities.ReminderEntity;
 import org.catalog_app.error.NotFoundException;
 import org.catalog_app.repositories.RecurrenceRuleRepository;
@@ -59,11 +60,15 @@ public class ReminderController {
         ent.setCreatedAt(dto.getCreatedAt());
         ent.setUpdatedAt(dto.getUpdatedAt());
 
-        if (dto.getRecurrenceRuleId() != null) {
-            var rule = recurrenceRuleRepository.findById(dto.getRecurrenceRuleId())
-                    .orElseThrow(() -> new NotFoundException("Rule not found with id" + dto.getRecurrenceRuleId()));
+        if (dto.getRecurrenceRule() != null) {
+            var rule = new RecurrenceRuleEntity();
+            rule.setFrequency(dto.getRecurrenceRule().getFrequency());
+            rule.setIntervalValue(dto.getRecurrenceRule().getIntervalValue());
+            rule.setUntilType(dto.getRecurrenceRule().getUntilType());
+            rule.setUntilDate(dto.getRecurrenceRule().getUntilDate());
             ent.setRecurrenceRule(rule);
         }
+
         return toDto(repository.save(ent));
     }
 
@@ -80,6 +85,13 @@ public class ReminderController {
     @PutMapping("/{id}")
     public ReminderDto update(@PathVariable(name = "id") Long id, @RequestBody ReminderDto dto) {
         return toDto(service.update(id, toEntity(dto)));
+    }
+
+    @PutMapping("/{id}/active")
+    public ReminderDto updateActive(
+            @PathVariable(name = "id") Long id,
+            @RequestParam boolean isActive) {
+        return toDto(service.updateActive(id, isActive));
     }
 
     @DeleteMapping("/{id}")

@@ -24,4 +24,5 @@ public class ItemDto {
     private Long parentId;
     private Long category;
     private Set<TagDto> tags = new HashSet<>();
+    private Long userId;
 }

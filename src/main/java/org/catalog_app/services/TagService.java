@@ -18,24 +18,38 @@ public class TagService {
     }
 
     @Transactional
-    public List<TagEntity> getAll() {
+    public List<TagEntity> getAll(Long userId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID must not be null");
+        }
+
         return StreamSupport.stream(repository.findAll().spliterator(), false).toList();
     }
     @Transactional
-    public TagEntity get(Long id) {
+    public TagEntity get(Long userId, Long id) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID must not be null");
+        }
         return repository.findById(id)
                 .orElseThrow(() -> new NotFoundException(TagEntity.class, id));
     }
 
     @Transactional
-    public TagEntity create(TagEntity entity) {
+    public TagEntity create(Long userId, TagEntity entity) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID must not be null");
+        }
         if (entity == null) {
             throw new IllegalArgumentException("Entity is null");
         }
         return repository.save(entity);
     }
     @Transactional
-    public TagEntity update(Long id,  TagEntity entity) {
+    public TagEntity update(Long userId, Long id,  TagEntity entity) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID must not be null");
+        }
+
         TagEntity el = repository.findById(id)
                 .orElseThrow(() -> new NotFoundException(TagEntity.class, id));
         el.setName(entity.getName());
@@ -44,8 +58,12 @@ public class TagService {
     }
 
     @Transactional
-    public TagEntity delete(Long id) {
-        final TagEntity existsEntity = get(id);
+    public TagEntity delete(Long userId, Long id) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID must not be null");
+        }
+
+        final TagEntity existsEntity = get(userId, id);
         repository.delete(existsEntity);
         return existsEntity;
     }

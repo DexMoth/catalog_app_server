@@ -44,6 +44,7 @@ public class ItemController {
         dto.setId(ent.getId());
         dto.setName(ent.getName());
         dto.setDescription(ent.getDescription());
+        dto.setUserId(ent.getUserId());
 
         if (ent.getParent() != null) {
             dto.setParentId(ent.getParent().getId());
@@ -70,6 +71,7 @@ public class ItemController {
         entity.setId(dto.getId());
         entity.setName(dto.getName());
         entity.setDescription(dto.getDescription());
+        entity.setUserId(dto.getUserId());
 
         if (dto.getParentId() != null) {
             ItemEntity parent = new ItemEntity();
@@ -93,19 +95,19 @@ public class ItemController {
 
     @PostMapping
     public ItemDto create(
-            @PathVariable(name = "user") Long userId,
+            @RequestParam(name = "userId") Long userId,
             @RequestBody @Valid ItemDto dto) {
         return toDto(service.create(userId, toEntity(dto)));
     }
 
     @GetMapping
     public List<ItemDto> getAll(
-            @RequestParam Long user,
+            @RequestParam(name = "userId") Long userId,
             @RequestParam(required = false) Long category,
             @RequestParam(required = false) Long tag,
             @RequestParam(required = false) String search) {
 
-        return service.getAll(user, category, tag, search)
+        return service.getAll(userId, category, tag, search)
                 .stream()
                 .map( this::toDto)
                 .toList();
@@ -113,7 +115,7 @@ public class ItemController {
 
     @GetMapping("/roots")
     public List<ItemDto> getAllWithoutParent(
-            @PathVariable(name = "user") Long userId) {
+            @RequestParam(name = "userId") Long userId) {
         return service.getAllWithoutParent(userId)
                 .stream()
                 .map(this::toDto)
@@ -122,7 +124,7 @@ public class ItemController {
 
     @GetMapping("/{id}/children")
     public List<ItemDto> getChildren(
-            @PathVariable(name = "user") Long userId,
+            @RequestParam(name = "userId") Long userId,
             @PathVariable(name = "id") Long id) {
         return service.findChildren(userId, id)
                 .stream()
@@ -132,23 +134,23 @@ public class ItemController {
 
     @GetMapping("/{id}")
     public ItemDto get(
-            @PathVariable(name = "id") Long id,
-            @PathVariable(name = "user") Long userId) {
+            @RequestParam(name = "userId") Long userId,
+            @PathVariable(name = "id") Long id) {
         return toDto(service.get(userId, id));
     }
 
     @PutMapping("/{id}")
     public ItemDto update(
+            @RequestParam(name = "userId") Long userId,
             @PathVariable(name = "id") Long id,
-            @PathVariable(name = "user") Long userId,
             @RequestBody ItemDto dto) {
         return toDto(service.update(userId, id , toEntity(dto)));
     }
 
     @DeleteMapping("/{id}")
     public ItemDto delete(
-            @PathVariable(name = "id") Long id,
-            @PathVariable(name = "user") Long userId) {
+            @RequestParam(name = "userId") Long userId,
+            @PathVariable(name = "id") Long id) {
         return toDto(service.delete(userId, id));
     }
 }

@@ -15,12 +15,10 @@ import java.util.List;
 @RestController
 @RequestMapping(Constants.API_URL + "/tag")
 public class TagController {
-    private final TagRepository repository;
     private final TagService service;
     private final ModelMapper modelMapper;
 
-    public TagController(TagRepository repository, TagService service, ModelMapper modelMapper) {
-        this.repository = repository;
+    public TagController(TagService service, ModelMapper modelMapper) {
         this.service = service;
         this.modelMapper = modelMapper;
     }
@@ -39,31 +37,43 @@ public class TagController {
 
 
     @PostMapping
-    public TagDto create(@RequestBody @Valid TagDto dto) {
+    public TagDto create(
+            @RequestParam(name = "userId") Long userId,
+            @RequestBody @Valid TagDto dto) {
         var ent = new TagEntity();
         ent.setName(dto.getName());
         ent.setCreatedAt(dto.getCreatedAt());
         ent.setUserId(dto.getUserId());
-        return toDto(repository.save(ent));
+        return toDto(service.create(userId, toEntity(dto)));
     }
 
     @GetMapping
-    public List<TagDto> getAll() {
-        return service.getAll().stream().map(this::toDto).toList();
+    public List<TagDto> getAll(
+            @RequestParam(name = "userId") Long userId) {
+        return service.getAll(userId)
+                .stream()
+                .map(this::toDto)
+                .toList();
     }
 
     @GetMapping("/{id}")
-    public TagDto get(@PathVariable(name = "id") Long id) {
-        return toDto(service.get(id));
+    public TagDto get(
+            @RequestParam(name = "userId") Long userId,
+            @PathVariable(name = "id") Long id) {
+        return toDto(service.get(userId, id));
     }
 
     @PutMapping("/{id}")
-    public TagDto update(@PathVariable(name = "id") Long id, @RequestBody TagDto dto) {
-        return toDto(service.update(id, toEntity(dto)));
+    public TagDto update(
+            @RequestParam(name = "userId") Long userId,
+            @PathVariable(name = "id") Long id, @RequestBody TagDto dto) {
+        return toDto(service.update(userId, id, toEntity(dto)));
     }
 
     @DeleteMapping("/{id}")
-    public TagDto delete(@PathVariable(name = "id") Long id) {
-        return toDto(service.delete(id));
+    public TagDto delete(
+            @RequestParam(name = "userId") Long userId,
+            @PathVariable(name = "id") Long id) {
+        return toDto(service.delete(userId, id));
     }
 }

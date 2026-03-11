@@ -1,8 +1,10 @@
 package org.catalog_app.services;
 
 import jakarta.transaction.Transactional;
+import org.catalog_app.entities.RecurrenceRuleEntity;
 import org.catalog_app.entities.ReminderEntity;
 import org.catalog_app.error.NotFoundException;
+import org.catalog_app.repositories.RecurrenceRuleRepository;
 import org.catalog_app.repositories.ReminderRepository;
 import org.springframework.stereotype.Service;
 
@@ -12,9 +14,11 @@ import java.util.stream.StreamSupport;
 @Service
 public class ReminderService {
     private final ReminderRepository repository;
+    private final RecurrenceRuleRepository ruleRepository;
 
-    public ReminderService(ReminderRepository repository) {
+    public ReminderService(ReminderRepository repository, RecurrenceRuleRepository ruleRepository) {
         this.repository = repository;
+        this.ruleRepository = ruleRepository;
     }
 
     @Transactional
@@ -42,12 +46,34 @@ public class ReminderService {
         el.setDescription(entity.getDescription());
         el.setMessage(entity.getMessage());
         el.setReminderDate(entity.getReminderDate());
-        el.setRecurrenceRule(entity.getRecurrenceRule());
         el.setIsActive(entity.getIsActive());
         el.setItemId(entity.getItemId());
         el.setUpdatedAt(entity.getUpdatedAt());
 
-        el.setRecurrenceRule(entity.getRecurrenceRule());
+        // если получили правило
+        if (entity.getRecurrenceRule() != null) {
+            // если правило уже есть, мы его меняем
+            if (entity.getRecurrenceRule().getId() != null) {
+                el.setRecurrenceRule(entity.getRecurrenceRule());
+            }
+            // если правила нет, создаем
+            else {
+                var newRule = new RecurrenceRuleEntity();
+                newRule.setFrequency(entity.getRecurrenceRule().getFrequency());
+                newRule.setIntervalValue(entity.getRecurrenceRule().getIntervalValue());
+                newRule.setUntilType(entity.getRecurrenceRule().getUntilType());
+                newRule.setUntilDate(entity.getRecurrenceRule().getUntilDate());
+                el.setRecurrenceRule(ruleRepository.save(newRule));
+            }
+        }
+        return repository.save(el);
+    }
+
+    @Transactional
+    public ReminderEntity updateActive(Long id, boolean isActive) {
+        ReminderEntity el = repository.findById(id)
+                .orElseThrow(() -> new NotFoundException(ReminderEntity.class, id));
+        el.setIsActive(isActive);
         return repository.save(el);
     }
 
