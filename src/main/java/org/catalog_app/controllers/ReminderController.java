@@ -9,6 +9,7 @@ import org.catalog_app.entities.ReminderEntity;
 import org.catalog_app.error.NotFoundException;
 import org.catalog_app.repositories.RecurrenceRuleRepository;
 import org.catalog_app.repositories.ReminderRepository;
+import org.catalog_app.services.RecurrenceRuleService;
 import org.catalog_app.services.ReminderService;
 import org.modelmapper.ModelMapper;
 import org.springframework.web.bind.annotation.*;
@@ -20,15 +21,15 @@ import java.util.List;
 @RequestMapping(Constants.API_URL + "/reminder")
 public class ReminderController {
     private final ReminderRepository repository;
-    private final RecurrenceRuleRepository recurrenceRuleRepository;
     private final ReminderService service;
     private final ModelMapper modelMapper;
+    private final RecurrenceRuleService recurrenceRuleService;
 
-    public ReminderController(ReminderRepository repository, RecurrenceRuleRepository recurrenceRuleRepository, ReminderService service, ModelMapper modelMapper) {
+    public ReminderController(ReminderRepository repository, ReminderService service, ModelMapper modelMapper, RecurrenceRuleService recurrenceRuleService) {
         this.repository = repository;
-        this.recurrenceRuleRepository = recurrenceRuleRepository;
         this.service = service;
         this.modelMapper = modelMapper;
+        this.recurrenceRuleService = recurrenceRuleService;
     }
 
     @Transactional
@@ -66,6 +67,8 @@ public class ReminderController {
             rule.setIntervalValue(dto.getRecurrenceRule().getIntervalValue());
             rule.setUntilType(dto.getRecurrenceRule().getUntilType());
             rule.setUntilDate(dto.getRecurrenceRule().getUntilDate());
+            recurrenceRuleService.create(rule);
+
             ent.setRecurrenceRule(rule);
         }
 

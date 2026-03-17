@@ -15,10 +15,12 @@ import java.util.stream.StreamSupport;
 public class ReminderService {
     private final ReminderRepository repository;
     private final RecurrenceRuleRepository ruleRepository;
+    private final RecurrenceRuleService ruleService;
 
-    public ReminderService(ReminderRepository repository, RecurrenceRuleRepository ruleRepository) {
+    public ReminderService(ReminderRepository repository, RecurrenceRuleRepository ruleRepository, RecurrenceRuleService ruleService) {
         this.repository = repository;
         this.ruleRepository = ruleRepository;
+        this.ruleService = ruleService;
     }
 
     @Transactional
@@ -54,6 +56,8 @@ public class ReminderService {
         if (entity.getRecurrenceRule() != null) {
             // если правило уже есть, мы его меняем
             if (entity.getRecurrenceRule().getId() != null) {
+                var rule = entity.getRecurrenceRule();
+                ruleService.update(rule.getId(), rule);
                 el.setRecurrenceRule(entity.getRecurrenceRule());
             }
             // если правила нет, создаем
@@ -63,7 +67,7 @@ public class ReminderService {
                 newRule.setIntervalValue(entity.getRecurrenceRule().getIntervalValue());
                 newRule.setUntilType(entity.getRecurrenceRule().getUntilType());
                 newRule.setUntilDate(entity.getRecurrenceRule().getUntilDate());
-                el.setRecurrenceRule(ruleRepository.save(newRule));
+                el.setRecurrenceRule(ruleService.create(newRule));
             }
         }
         return repository.save(el);
