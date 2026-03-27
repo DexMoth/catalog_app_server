@@ -21,7 +21,13 @@ import java.util.Set;
 public class ItemEntity extends BaseModel{
     private String name;
     private String description;
+
+    @Column(name = "image_path")
+    private String imagePath;
+
+    @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt = LocalDateTime.now();
 
     @ManyToOne(fetch = FetchType.EAGER)

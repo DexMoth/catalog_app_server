@@ -43,8 +43,11 @@ public class ItemController {
         ItemDto dto = new ItemDto();
         dto.setId(ent.getId());
         dto.setName(ent.getName());
+        dto.setImagePath(ent.getImagePath());
         dto.setDescription(ent.getDescription());
         dto.setUserId(ent.getUserId());
+        dto.setCreatedAt(ent.getCreatedAt());
+        dto.setUpdatedAt(ent.getUpdatedAt());
 
         if (ent.getParent() != null) {
             dto.setParentId(ent.getParent().getId());
@@ -71,6 +74,7 @@ public class ItemController {
         entity.setId(dto.getId());
         entity.setName(dto.getName());
         entity.setDescription(dto.getDescription());
+        entity.setImagePath(dto.getImagePath());
         entity.setUserId(dto.getUserId());
 
         if (dto.getParentId() != null) {

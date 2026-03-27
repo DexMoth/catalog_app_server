@@ -50,7 +50,7 @@ public class ItemService {
     }
 
     @Transactional
-    public ItemEntity  get(Long userId, Long id) {
+    public ItemEntity get(Long userId, Long id) {
         if (userId == null) {
             throw new IllegalArgumentException("User ID must not be null");
         }
@@ -88,6 +88,7 @@ public class ItemService {
         ItemEntity el = repository.findById(id)
                 .orElseThrow(() -> new NotFoundException(ItemEntity.class, id));
         el.setName(entity.getName());
+        el.setImagePath(entity.getImagePath());
         el.setUpdatedAt(entity.getUpdatedAt());
         el.setDescription(entity.getDescription());
         el.setCategory(entity.getCategory());

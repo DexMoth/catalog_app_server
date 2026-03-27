@@ -19,6 +19,7 @@ public class ItemDto {
     private Long id;
     private String name;
     private String description;
+    private String imagePath;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Long parentId;
