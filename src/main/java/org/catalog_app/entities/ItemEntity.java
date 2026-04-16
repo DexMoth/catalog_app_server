@@ -22,7 +22,7 @@ public class ItemEntity extends BaseModel{
     private String name;
     private String description;
 
-    @Column(name = "image_path")
+    @Column(name = "image_path", columnDefinition = "TEXT") // чтобы влезло base64
     private String imagePath;
 
     @Column(name = "created_at")

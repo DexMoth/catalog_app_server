@@ -104,6 +104,23 @@ public class ItemService {
         }
 
         final ItemEntity existsEntity = get(userId, id);
+
+        // чистим родителя у потомков этого предмета
+        List<ItemEntity> children = repository.findByUserIdAndParentId(userId, id);
+        if (existsEntity.getParent() == null) {
+            for (ItemEntity child : children) {
+                child.setParent(null);
+                repository.save(child);
+            }
+        } else {
+            var newParent = existsEntity.getParent();
+            for (ItemEntity child : children) {
+                child.setParent(newParent);
+                repository.save(child);
+            }
+        }
+
+
         repository.delete(existsEntity);
         return existsEntity;
     }
