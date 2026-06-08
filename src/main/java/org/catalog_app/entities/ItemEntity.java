@@ -21,6 +21,7 @@ import java.util.Set;
 public class ItemEntity extends BaseModel{
     private String name;
     private String description;
+    private String embedding;
 
     @Column(name = "image_path", columnDefinition = "TEXT") // чтобы влезло base64
     private String imagePath;

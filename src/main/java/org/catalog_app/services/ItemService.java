@@ -93,7 +93,8 @@ public class ItemService {
         el.setDescription(entity.getDescription());
         el.setCategory(entity.getCategory());
         el.setTags(entity.getTags());
-        el.setParent(entity.getParent());;
+        el.setParent(entity.getParent());
+        el.setEmbedding(entity.getEmbedding());
         return repository.save(el);
     }
 
