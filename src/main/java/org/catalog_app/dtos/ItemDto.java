@@ -19,10 +19,12 @@ public class ItemDto {
     private Long id;
     private String name;
     private String description;
+    private String embedding;
     private String imagePath;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Long parentId;
-    private Set<CategoryDto> categories = new HashSet<>();
+    private Long category;
     private Set<TagDto> tags = new HashSet<>();
+    private Long userId;
 }

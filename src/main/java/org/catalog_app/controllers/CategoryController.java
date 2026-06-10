@@ -39,29 +39,41 @@ public class CategoryController {
 
 
     @PostMapping
-    public CategoryDto create(@RequestBody @Valid CategoryDto dto) {
+    public CategoryDto create(
+            @RequestParam(name = "userId") Long userId,
+            @RequestBody @Valid CategoryDto dto) {
         var ent = new CategoryEntity();
         ent.setName(dto.getName());
+        ent.setCreatedAt(dto.getCreatedAt());
+        ent.setUserId(dto.getUserId());
         return toDto(repository.save(ent));
     }
 
     @GetMapping
-    public List<CategoryDto> getAll() {
-        return service.getAll().stream().map(this::toDto).toList();
+    public List<CategoryDto> getAll(
+            @RequestParam(name = "userId") Long userId) {
+        return service.getAll(userId).stream().map(this::toDto).toList();
     }
 
     @GetMapping("/{id}")
-    public CategoryDto get(@PathVariable(name = "id") Long id) {
-        return toDto(service.get(id));
+    public CategoryDto get(
+            @RequestParam(name = "userId") Long userId,
+            @PathVariable(name = "id") Long id) {
+        return toDto(service.get(userId, id));
     }
 
     @PutMapping("/{id}")
-    public CategoryDto update(@PathVariable(name = "id") Long id, @RequestBody CategoryDto dto) {
-        return toDto(service.update(id, toEntity(dto)));
+    public CategoryDto update(
+            @RequestParam(name = "userId") Long userId,
+            @PathVariable(name = "id") Long id,
+            @RequestBody CategoryDto dto) {
+        return toDto(service.update(userId, id, toEntity(dto)));
     }
 
     @DeleteMapping("/{id}")
-    public CategoryDto delete(@PathVariable(name = "id") Long id) {
-        return toDto(service.delete(id));
+    public CategoryDto delete(
+            @RequestParam(name = "userId") Long userId,
+            @PathVariable(name = "id") Long id) {
+        return toDto(service.delete(userId, id));
     }
 }

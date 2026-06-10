@@ -8,6 +8,8 @@ import org.catalog_app.entities.CategoryEntity;
 import org.catalog_app.entities.ItemEntity;
 import jakarta.transaction.Transactional;
 import org.catalog_app.entities.TagEntity;
+import org.catalog_app.error.NotFoundException;
+import org.catalog_app.repositories.CategoryRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.web.bind.annotation.*;
 import org.catalog_app.repositories.ItemRepository;
@@ -23,11 +25,13 @@ import java.util.stream.Collectors;
 @RequestMapping(Constants.API_URL + "/item")
 public class ItemController {
     private final ItemRepository repository;
+    private final CategoryRepository categoryRepository;
     private final ItemService service;
     private final ModelMapper modelMapper;
 
-    public ItemController(ItemRepository repository, ItemService service, ModelMapper modelMapper) {
+    public ItemController(ItemRepository repository, CategoryRepository categoryRepository, ItemService service, ModelMapper modelMapper) {
         this.repository = repository;
+        this.categoryRepository = categoryRepository;
         this.service = service;
         this.modelMapper = modelMapper;
     }
@@ -39,18 +43,18 @@ public class ItemController {
         ItemDto dto = new ItemDto();
         dto.setId(ent.getId());
         dto.setName(ent.getName());
-        dto.setDescription(ent.getDescription());
         dto.setImagePath(ent.getImagePath());
+        dto.setDescription(ent.getDescription());
+        dto.setUserId(ent.getUserId());
+        dto.setCreatedAt(ent.getCreatedAt());
+        dto.setUpdatedAt(ent.getUpdatedAt());
 
         if (ent.getParent() != null) {
             dto.setParentId(ent.getParent().getId());
         }
 
-        if (ent.getCategories() != null) {
-            Set<CategoryDto> categories = ent.getCategories().stream()
-                    .map(categoryEntity -> modelMapper.map(categoryEntity, CategoryDto.class))
-                    .collect(Collectors.toSet());
-            dto.setCategories(categories);
+        if (ent.getCategory() != null) {
+            dto.setCategory(ent.getCategory().getId());
         }
 
         if (ent.getTags() != null) {
@@ -71,17 +75,17 @@ public class ItemController {
         entity.setName(dto.getName());
         entity.setDescription(dto.getDescription());
         entity.setImagePath(dto.getImagePath());
+        entity.setUserId(dto.getUserId());
 
         if (dto.getParentId() != null) {
             ItemEntity parent = new ItemEntity();
             parent.setId(dto.getParentId());
             entity.setParent(parent);
         }
-        if (dto.getCategories() != null) {
-            Set<CategoryEntity> categories = dto.getCategories().stream()
-                    .map(categoryDto -> modelMapper.map(categoryDto, CategoryEntity.class))
-                    .collect(Collectors.toSet());
-            entity.setCategories(categories);
+        if (dto.getCategory() != null) {
+            CategoryEntity category = categoryRepository.findById(dto.getCategory())
+                    .orElseThrow(() -> new NotFoundException("Category not found with id" + dto.getCategory()));
+            entity.setCategory(category);
         }
         if (dto.getTags() != null) {
             Set<TagEntity> tags = dto.getTags().stream()
@@ -94,25 +98,29 @@ public class ItemController {
 
 
     @PostMapping
-    public ItemDto create(@RequestBody @Valid ItemDto dto) {
-        return toDto(service.create(toEntity(dto)));
+    public ItemDto create(
+            @RequestParam(name = "userId") Long userId,
+            @RequestBody @Valid ItemDto dto) {
+        return toDto(service.create(userId, toEntity(dto)));
     }
 
     @GetMapping
     public List<ItemDto> getAll(
+            @RequestParam(name = "userId") Long userId,
             @RequestParam(required = false) Long category,
             @RequestParam(required = false) Long tag,
             @RequestParam(required = false) String search) {
 
-        return service.getAll(category, tag, search)
+        return service.getAll(userId, category, tag, search)
                 .stream()
                 .map( this::toDto)
                 .toList();
     }
 
     @GetMapping("/roots")
-    public List<ItemDto> getAllWithoutParent() {
-        return service.getAllWithoutParent()
+    public List<ItemDto> getAllWithoutParent(
+            @RequestParam(name = "userId") Long userId) {
+        return service.getAllWithoutParent(userId)
                 .stream()
                 .map(this::toDto)
                 .toList();
@@ -120,25 +128,33 @@ public class ItemController {
 
     @GetMapping("/{id}/children")
     public List<ItemDto> getChildren(
+            @RequestParam(name = "userId") Long userId,
             @PathVariable(name = "id") Long id) {
-        return service.findChildren(id)
+        return service.findChildren(userId, id)
                 .stream()
                 .map(this::toDto)
                 .toList();
     }
 
     @GetMapping("/{id}")
-    public ItemDto get(@PathVariable(name = "id") Long id) {
-        return toDto(service.get(id));
+    public ItemDto get(
+            @RequestParam(name = "userId") Long userId,
+            @PathVariable(name = "id") Long id) {
+        return toDto(service.get(userId, id));
     }
 
     @PutMapping("/{id}")
-    public ItemDto update(@PathVariable(name = "id") Long id, @RequestBody ItemDto dto) {
-        return toDto(service.update(id, toEntity(dto)));
+    public ItemDto update(
+            @RequestParam(name = "userId") Long userId,
+            @PathVariable(name = "id") Long id,
+            @RequestBody ItemDto dto) {
+        return toDto(service.update(userId, id , toEntity(dto)));
     }
 
     @DeleteMapping("/{id}")
-    public ItemDto delete(@PathVariable(name = "id") Long id) {
-        return toDto(service.delete(id));
+    public ItemDto delete(
+            @RequestParam(name = "userId") Long userId,
+            @PathVariable(name = "id") Long id) {
+        return toDto(service.delete(userId, id));
     }
 }
