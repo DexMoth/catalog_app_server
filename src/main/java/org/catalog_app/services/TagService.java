@@ -23,14 +23,14 @@ public class TagService {
             throw new IllegalArgumentException("User ID must not be null");
         }
 
-        return StreamSupport.stream(repository.findAll().spliterator(), false).toList();
+        return StreamSupport.stream(repository.findByUserId(userId).spliterator(), false).toList();
     }
     @Transactional
     public TagEntity get(Long userId, Long id) {
         if (userId == null) {
             throw new IllegalArgumentException("User ID must not be null");
         }
-        return repository.findById(id)
+        return repository.findByUserIdAndId(userId, id)
                 .orElseThrow(() -> new NotFoundException(TagEntity.class, id));
     }
 
@@ -42,6 +42,7 @@ public class TagService {
         if (entity == null) {
             throw new IllegalArgumentException("Entity is null");
         }
+        entity.setUserId(userId);
         return repository.save(entity);
     }
     @Transactional

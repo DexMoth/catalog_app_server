@@ -46,7 +46,9 @@ public class ReminderController {
 
 
     @PostMapping
-    public ReminderDto create(@RequestBody @Valid ReminderDto dto) {
+    public ReminderDto create(
+            @RequestParam(name = "userId") Long userId,
+            @RequestBody @Valid ReminderDto dto) {
         var ent = new ReminderEntity();
         ent.setTitle(dto.getTitle());
         ent.setDescription(dto.getDescription());
@@ -72,33 +74,43 @@ public class ReminderController {
             ent.setRecurrenceRule(rule);
         }
 
-        return toDto(repository.save(ent));
+        return toDto(service.create(userId, ent));
     }
 
     @GetMapping
-    public List<ReminderDto> getAll() {
-        return service.getAll().stream().map(this::toDto).toList();
+    public List<ReminderDto> getAll(
+            @RequestParam(name = "userId") Long userId)
+    {
+        return service.getAll(userId).stream().map(this::toDto).toList();
     }
 
     @GetMapping("/{id}")
-    public ReminderDto get(@PathVariable(name = "id") Long id) {
-        return toDto(service.get(id));
+    public ReminderDto get(
+            @RequestParam(name = "userId") Long userId,
+            @PathVariable(name = "id") Long id) {
+        return toDto(service.get(userId, id));
     }
 
     @PutMapping("/{id}")
-    public ReminderDto update(@PathVariable(name = "id") Long id, @RequestBody ReminderDto dto) {
-        return toDto(service.update(id, toEntity(dto)));
+    public ReminderDto update(
+            @RequestParam(name = "userId") Long userId,
+            @PathVariable(name = "id") Long id,
+            @RequestBody ReminderDto dto) {
+        return toDto(service.update(userId, id, toEntity(dto)));
     }
 
     @PutMapping("/{id}/active")
     public ReminderDto updateActive(
+            @RequestParam(name = "userId") Long userId,
             @PathVariable(name = "id") Long id,
             @RequestParam boolean isActive) {
-        return toDto(service.updateActive(id, isActive));
+        return toDto(service.updateActive(userId, id, isActive));
     }
 
     @DeleteMapping("/{id}")
-    public ReminderDto delete(@PathVariable(name = "id") Long id) {
-        return toDto(service.delete(id));
+    public ReminderDto delete(
+            @RequestParam(name = "userId") Long userId,
+            @PathVariable(name = "id") Long id) {
+        return toDto(service.delete(userId, id));
     }
 }

@@ -6,12 +6,50 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.catalog_app.repositories.CategoryRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
 @Service
 public class CategoryService {
     private final CategoryRepository repository;
+    private static final List<String> DEFAULT_CATEGORIES = List.of(
+            "одежда",
+            "книги",
+            "мебель",
+            "посуда",
+            "медицина",
+            "уборка",
+            "техника",
+            "творчество",
+            "аксессуары",
+            "детское",
+            "безопасность",
+            "хоз. инструменты",
+            "текстиль",
+            "хранение",
+            "декор",
+            "канцелярия",
+            "хобби",
+            "электроника"
+    );
+
+    @Transactional
+    public void createDefaultCategoriesForUser(Long userId) {
+        for (String categoryName : DEFAULT_CATEGORIES) {
+            try {
+                CategoryEntity category = new CategoryEntity();
+                category.setName(categoryName);
+                category.setUserId(userId);
+                category.setCreatedAt(LocalDateTime.now());
+                category.setUpdatedAt(LocalDateTime.now());
+                repository.save(category);
+                System.out.println("Создана категория: " + categoryName + " для пользователя " + userId);
+            } catch (Exception e) {
+                System.out.println("Ошибка при создании категории " + categoryName + ": " + e.getMessage());
+            }
+        }
+    }
 
     public CategoryService(CategoryRepository repository) {
         this.repository = repository;
@@ -23,7 +61,7 @@ public class CategoryService {
             throw new IllegalArgumentException("User ID must not be null");
         }
 
-        return StreamSupport.stream(repository.findAll().spliterator(), false).toList();
+        return StreamSupport.stream(repository.findByUserId(userId).spliterator(), false).toList();
     }
     @Transactional
     public CategoryEntity get(Long userId, Long id) {
@@ -31,7 +69,7 @@ public class CategoryService {
             throw new IllegalArgumentException("User ID must not be null");
         }
 
-        return repository.findById(id)
+        return repository.findByUserIdAndId(userId, id)
                 .orElseThrow(() -> new NotFoundException(CategoryEntity.class, id));
     }
 
@@ -44,6 +82,7 @@ public class CategoryService {
         if (entity == null) {
             throw new IllegalArgumentException("Entity is null");
         }
+        entity.setUserId(userId);
         return repository.save(entity);
     }
     @Transactional

@@ -24,24 +24,37 @@ public class ReminderService {
     }
 
     @Transactional
-    public List<ReminderEntity> getAll() {
-        return StreamSupport.stream(repository.findAll().spliterator(), false).toList();
+    public List<ReminderEntity> getAll(Long userId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID must not be null");
+        }
+        return StreamSupport.stream(repository.findByUserId(userId).spliterator(), false).toList();
     }
     @Transactional
-    public ReminderEntity get(Long id) {
-        return repository.findById(id)
+    public ReminderEntity get(Long userId, Long id) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID must not be null");
+        }
+        return repository.findByUserIdAndId(userId, id)
                 .orElseThrow(() -> new NotFoundException(ReminderEntity.class, id));
     }
 
     @Transactional
-    public ReminderEntity create(ReminderEntity entity) {
+    public ReminderEntity create(Long userId, ReminderEntity entity) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID must not be null");
+        }
         if (entity == null) {
             throw new IllegalArgumentException("Entity is null");
         }
         return repository.save(entity);
     }
     @Transactional
-    public ReminderEntity update(Long id,  ReminderEntity entity) {
+    public ReminderEntity update(Long userId, Long id,  ReminderEntity entity) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID must not be null");
+        }
+
         ReminderEntity el = repository.findById(id)
                 .orElseThrow(() -> new NotFoundException(ReminderEntity.class, id));
         el.setTitle(entity.getTitle());
@@ -74,7 +87,11 @@ public class ReminderService {
     }
 
     @Transactional
-    public ReminderEntity updateActive(Long id, boolean isActive) {
+    public ReminderEntity updateActive(Long userId, Long id, boolean isActive) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID must not be null");
+        }
+
         ReminderEntity el = repository.findById(id)
                 .orElseThrow(() -> new NotFoundException(ReminderEntity.class, id));
         el.setIsActive(isActive);
@@ -82,8 +99,11 @@ public class ReminderService {
     }
 
     @Transactional
-    public ReminderEntity delete(Long id) {
-        final ReminderEntity existsEntity = get(id);
+    public ReminderEntity delete(Long userId, Long id) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID must not be null");
+        }
+        final ReminderEntity existsEntity = get(userId, id);
         repository.delete(existsEntity);
         return existsEntity;
     }
